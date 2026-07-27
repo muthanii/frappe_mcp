@@ -18,7 +18,7 @@ about:
   icon: https://frappeframework.com/assets/frappe_io/frappe-framework-logo.svg
 source:
   project: https://github.com/muthanii/frappe_mcp
-  commit: bd84190d5a51447626d1217921f5bb260fc68328
+  commit: 638a282c0d9ffa7156d155361da39d02d48c58cc
 config:
   description: Configure the connection to your Frappe/ERPNext site
   secrets:
