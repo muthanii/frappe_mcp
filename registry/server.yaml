@@ -10,7 +10,7 @@ meta:
     - erp
     - business
 about:
-  title: Frappe MCP
+  title: Frappe Framework
   description: >
     MCP server for Frappe Framework — interact with any Frappe/ERPNext site
     via its REST API. Perform document CRUD, search, and call whitelisted
