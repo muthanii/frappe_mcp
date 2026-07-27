@@ -78,4 +78,6 @@ frappe-mcp
 
 ## License
 
+MIT — see [LICENSE](LICENSE).
+
 MIT
