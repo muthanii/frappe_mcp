@@ -1,0 +1,21 @@
+[project]
+name = "frappe-mcp-server"
+version = "1.0.0"
+description = "MCP server for Frappe Framework — interact with Frappe sites via Claude, Copilot, and other MCP clients"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+frappe-mcp = "frappe_mcp.server:main"
+
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["frappe_mcp*"]
