@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 from typing import Any
 
+import httpx
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import (
@@ -14,7 +16,25 @@ from mcp.types import (
     Tool,
 )
 
-from frappe_mcp.client import FrappeClient
+from frappe_mcp.client import (
+    FrappeAuthError,
+    FrappeClient,
+    FrappeConflictError,
+    FrappeConnectionError,
+    FrappeError,
+    FrappeNotFoundError,
+)
+
+# ------------------------------------------------------------------ #
+#  Logging — writes to stderr so MCP stdio is not polluted
+# ------------------------------------------------------------------ #
+
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    stream=sys.stderr,
+)
+logger = logging.getLogger("frappe_mcp")
 
 # ------------------------------------------------------------------ #
 #  Configuration
@@ -25,6 +45,38 @@ def _get_client() -> FrappeClient:
     verify = os.environ.get("FRAPPE_VERIFY_SSL", "true").lower() != "false"
     timeout = float(os.environ.get("FRAPPE_TIMEOUT", "30"))
     return FrappeClient(verify_ssl=verify, timeout=timeout)
+
+
+# ------------------------------------------------------------------ #
+#  Friendly error messages for common failure modes
+# ------------------------------------------------------------------ #
+
+ERROR_HINTS = {
+    FrappeConnectionError: (
+        "Cannot reach Frappe at {url}. Is the URL correct and is the "
+        "site running?"
+    ),
+    FrappeAuthError: (
+        "Authentication rejected by {url}. Check FRAPPE_API_KEY and "
+        "FRAPPE_API_SECRET."
+    ),
+    FrappeNotFoundError: (
+        "The requested resource was not found on {url}. Check the "
+        "doctype and document name."
+    ),
+    FrappeConflictError: (
+        "A conflict occurred — the document may already exist."
+    ),
+    FrappeError: "Frappe error: {error}",
+}
+
+
+def _format_error(client: FrappeClient, exc: Exception) -> str:
+    """Return a user-friendly error string for common failure modes."""
+    for exc_type, template in ERROR_HINTS.items():
+        if isinstance(exc, exc_type):
+            return template.format(url=client.url, error=exc)
+    return str(exc)
 
 
 # ------------------------------------------------------------------ #
@@ -182,41 +234,86 @@ async def list_tools() -> list[Tool]:
 
 
 @app.call_tool()
-async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
-    client = _get_client()
-    try:
-        if name == "frappe_ping":
-            result = client.ping()
-        elif name == "frappe_get_doc":
-            result = client.get_doc(arguments["doctype"], arguments["name"])
-        elif name == "frappe_search_docs":
-            result = client.search_docs(
-                doctype=arguments["doctype"],
-                filters=arguments.get("filters"),
-                fields=arguments.get("fields"),
-                limit=arguments.get("limit", 20),
-                order_by=arguments.get("order_by"),
-            )
-        elif name == "frappe_create_doc":
-            result = client.create_doc(arguments["doctype"], arguments["data"])
-        elif name == "frappe_update_doc":
-            result = client.update_doc(
-                arguments["doctype"], arguments["name"], arguments["data"]
-            )
-        elif name == "frappe_delete_doc":
-            result = client.delete_doc(arguments["doctype"], arguments["name"])
-        elif name == "frappe_run_method":
-            result = client.run_method(
-                arguments["method"], arguments.get("kwargs")
-            )
-        else:
-            raise ValueError(f"Unknown tool: {name}")
+async def call_tool(
+    name: str, arguments: dict[str, Any]
+) -> list[TextContent]:
+    with _get_client() as client:
+        try:
+            if name == "frappe_ping":
+                result = client.ping()
+            elif name == "frappe_get_doc":
+                result = client.get_doc(
+                    arguments["doctype"], arguments["name"]
+                )
+            elif name == "frappe_search_docs":
+                result = client.search_docs(
+                    doctype=arguments["doctype"],
+                    filters=arguments.get("filters"),
+                    fields=arguments.get("fields"),
+                    limit=arguments.get("limit", 20),
+                    order_by=arguments.get("order_by"),
+                )
+            elif name == "frappe_create_doc":
+                result = client.create_doc(
+                    arguments["doctype"], arguments["data"]
+                )
+            elif name == "frappe_update_doc":
+                result = client.update_doc(
+                    arguments["doctype"],
+                    arguments["name"],
+                    arguments["data"],
+                )
+            elif name == "frappe_delete_doc":
+                result = client.delete_doc(
+                    arguments["doctype"], arguments["name"]
+                )
+            elif name == "frappe_run_method":
+                result = client.run_method(
+                    arguments["method"],
+                    arguments.get("kwargs"),
+                )
+            else:
+                return [
+                    TextContent(
+                        type="text",
+                        text=json.dumps(
+                            {"error": f"Unknown tool: {name}"}
+                        ),
+                    )
+                ]
 
-        return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
-    except Exception as exc:
-        return [TextContent(type="text", text=json.dumps({"error": str(exc)}))]
-    finally:
-        client.close()
+            return [
+                TextContent(
+                    type="text",
+                    text=json.dumps(result, indent=2, default=str),
+                )
+            ]
+
+        except (FrappeError, httpx.HTTPError) as exc:
+            msg = _format_error(client, exc)
+            logger.error("Tool %s failed: %s", name, msg)
+            return [
+                TextContent(
+                    type="text",
+                    text=json.dumps({"error": msg}),
+                )
+            ]
+        except Exception:
+            logger.exception("Unexpected error in tool %s", name)
+            return [
+                TextContent(
+                    type="text",
+                    text=json.dumps(
+                        {
+                            "error": (
+                                "An unexpected error occurred. "
+                                "Check the MCP server logs for "
+                                "details."
+                            )
+                        }
+                    ),
+                )
+            ]
 
 
 # ------------------------------------------------------------------ #
