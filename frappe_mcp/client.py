@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from typing import Any
 
@@ -89,9 +90,9 @@ class FrappeClient:
         """Search / list documents with optional filters."""
         params: dict[str, Any] = {}
         if filters:
-            params["filters"] = filters
+            params["filters"] = json.dumps(filters)
         if fields:
-            params["fields"] = fields
+            params["fields"] = json.dumps(fields)
         if limit:
             params["limit_page_length"] = limit
         if order_by:
