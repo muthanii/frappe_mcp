@@ -1,0 +1,24 @@
+{
+  "name": "Frappe MCP Server",
+  "description": "MCP server for Frappe Framework — interact with Frappe/ERPNext sites via Claude, Copilot, and other MCP clients through REST API.",
+  "categories": ["ERP Systems", "Databases", "Developer Tools"],
+  "relatedServers": [
+    {
+      "id": "appliedrelevance/frappe-mcp",
+      "description": "Enables interaction with Frappe Framework sites through comprehensive document operations, schema introspection, report generation, and method execution."
+    },
+    {
+      "id": "danielsebastianc/frappe-api-mcp",
+      "description": "Enables interaction with Frappe and ERPNext sites through their REST API endpoints using standard HTTP methods."
+    },
+    {
+      "id": "frappe/frappe-mcp",
+      "description": "Allows Frappe Framework apps to function as MCP servers, exposing Python-defined tools for LLM interaction."
+    }
+  ],
+  "tags": ["frappe", "erpnext", "erp", "business", "rest-api", "docker"],
+  "features": {
+    "httpAuth": "token",
+    "dockerImage": "muthanii/frappe-mcp"
+  }
+}
