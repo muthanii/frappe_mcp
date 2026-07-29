@@ -2,19 +2,19 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.muthanii/frappe_mcp",
   "title": "Frappe MCP Server",
-  "description": "Interact with Frappe/ERPNext sites — document CRUD, search, and whitelisted method calls",
+  "description": "Interact with Frappe/ERPNext sites \u2014 document CRUD, search, and whitelisted method calls",
   "repository": {
     "url": "https://github.com/muthanii/frappe_mcp",
     "source": "github"
   },
   "websiteUrl": "https://github.com/muthanii/frappe_mcp",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "frappe-mcp-server",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"
@@ -61,7 +61,7 @@
     },
     {
       "registryType": "oci",
-      "identifier": "docker.io/muthanii/frappe-mcp:1.1.2",
+      "identifier": "docker.io/muthanii/frappe-mcp:1.2.0",
       "transport": {
         "type": "stdio"
       },
@@ -107,7 +107,7 @@
     },
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/muthanii/frappe-mcp:1.1.2",
+      "identifier": "ghcr.io/muthanii/frappe-mcp:1.2.0",
       "transport": {
         "type": "stdio"
       },
