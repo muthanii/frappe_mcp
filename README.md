@@ -10,7 +10,9 @@
 
 [![frappe_mcp MCP server](https://glama.ai/mcp/servers/muthanii/frappe_mcp/badges/score.svg)](https://glama.ai/mcp/servers/muthanii/frappe_mcp)
 
+```
 mcp-name: io.github.muthanii/frappe_mcp
+```
 
 A **Model Context Protocol (MCP) server** for [Frappe Framework](https://frappeframework.com).
 Connect Claude Desktop, VS Code Copilot, and other MCP clients to any Frappe/ERPNext site
