@@ -77,15 +77,19 @@ docker run -i --rm \
 
 ## Available tools
 
-| Tool | Description |
-|------|-------------|
-| `frappe_ping` | Check connectivity to the Frappe site |
-| `frappe_get_doc` | Retrieve a single document by doctype + name |
-| `frappe_search_docs` | Search/list documents with filters |
-| `frappe_create_doc` | Create a new document |
-| `frappe_update_doc` | Update an existing document |
-| `frappe_delete_doc` | Delete a document |
-| `frappe_run_method` | Call a whitelisted server-side method |
+Every tool ships MCP [tool annotations](https://modelcontextprotocol.io/specification/server/tools) and a declared `outputSchema`, so a client can tell read tools from destructive ones before calling them.
+
+| Tool | Description | Access | Destructive | Idempotent |
+|------|-------------|--------|-------------|------------|
+| `frappe_ping` | Check connectivity and credentials | read-only | no | yes |
+| `frappe_get_doc` | Retrieve a single document by doctype + name | read-only | no | yes |
+| `frappe_search_docs` | Search/list documents with filters | read-only | no | yes |
+| `frappe_create_doc` | Create a new document | write | no | no |
+| `frappe_update_doc` | Update an existing document | write | yes | yes |
+| `frappe_delete_doc` | Delete a document — irreversible | write | yes | no |
+| `frappe_run_method` | Call a whitelisted server-side method | write | yes | no |
+
+`frappe_run_method` is marked destructive because its effect is determined entirely by the method you name.
 
 ## Configuration
 
