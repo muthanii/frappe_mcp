@@ -5,6 +5,9 @@ LABEL org.opencontainers.image.description="MCP server for Frappe Framework — 
 LABEL org.opencontainers.image.source="https://hub.docker.com/r/muthanii/frappe-mcp"
 LABEL org.opencontainers.image.licenses="MIT"
 
+# Ownership marker for the official MCP registry
+LABEL io.modelcontextprotocol.server.name="io.github.muthanii/frappe_mcp"
+
 # Create non-root user
 RUN groupadd -r frappe && useradd -r -g frappe -d /app frappe
 
