@@ -1,7 +1,23 @@
 .venv/
+venv/
 __pycache__/
 *.pyc
 *.egg-info/
 dist/
 build/
+
+# Secrets — never commit credentials
 .env
+.env.*
+!.env.example
+*.token
+*.pem
+*.key
+credentials.json
+secrets.json
+.netrc
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store

@@ -1,6 +1,6 @@
 [project]
 name = "frappe-mcp-server"
-version = "1.0.0"
+version = "1.1.0"
 description = "MCP server for Frappe Framework — interact with Frappe sites via Claude, Copilot, and other MCP clients"
 readme = "README.md"
 license = { text = "MIT" }

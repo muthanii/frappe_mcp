@@ -7,7 +7,6 @@
 A **Model Context Protocol (MCP) server** for [Frappe Framework](https://frappeframework.com).
 Connect Claude Desktop, VS Code Copilot, and other MCP clients to any Frappe/ERPNext site
 via its REST API.
-via its REST API.
 
 ## Features
 
@@ -84,5 +83,3 @@ frappe-mcp
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-MIT

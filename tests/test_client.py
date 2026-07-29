@@ -147,12 +147,54 @@ def test_search_docs_caps_limit(
 # -- URL encoding ------------------------------------------------------- #
 
 
-def test_get_doc_encodes_doctype(
-    client: FrappeClient, mock_response: MagicMock
-) -> None:
-    with patch.object(client._client, "request", return_value=mock_response):
-        client.get_doc("Sales Invoice", "SINV-00001")
-        call_args = client._client.request.call_args
-        assert "Sales%20Invoice" in call_args[0][1]\
-            or "Sales+Invoice" in call_args[0][1]\
-            or "Sales Invoice" in call_args[0][1]
+def _sent_url(client: FrappeClient, call: object) -> str:
+    """Run ``call`` against a mocked transport and return the final URL."""
+    resp = MagicMock(spec=httpx.Response)
+    resp.status_code = 200
+    resp.json.return_value = {"message": "ok"}
+    with patch.object(client._client, "send", return_value=resp) as send:
+        call()
+        return str(send.call_args[0][0].url)
+
+
+def test_get_doc_encodes_doctype(client: FrappeClient) -> None:
+    url = _sent_url(client, lambda: client.get_doc("Sales Invoice", "SINV-00001"))
+    assert url.endswith("/api/resource/Sales%20Invoice/SINV-00001")
+
+
+# -- path traversal ----------------------------------------------------- #
+
+
+def test_get_doc_rejects_path_traversal(client: FrappeClient) -> None:
+    """A ``..`` in the name must not escape the /api/resource/ endpoint."""
+    url = _sent_url(
+        client,
+        lambda: client.get_doc("Customer", "../../../api/method/frappe.x"),
+    )
+    assert "/api/method/" not in url
+    assert url.startswith("https://test.example.com/api/resource/Customer/")
+
+
+def test_delete_doc_rejects_path_traversal(client: FrappeClient) -> None:
+    url = _sent_url(
+        client, lambda: client.delete_doc("ToDo", "../../../api/method/frappe.x")
+    )
+    assert "/api/method/" not in url
+
+
+def test_run_method_rejects_path_traversal(client: FrappeClient) -> None:
+    url = _sent_url(client, lambda: client.run_method("../resource/User"))
+    assert "/api/resource/" not in url
+    assert url.startswith("https://test.example.com/api/method/")
+
+
+def test_run_method_preserves_dotted_path(client: FrappeClient) -> None:
+    """Encoding must leave legitimate dotted method paths untouched."""
+    url = _sent_url(client, lambda: client.run_method("frappe.auth.get_logged_user"))
+    assert url.endswith("/api/method/frappe.auth.get_logged_user")
+
+
+def test_get_doc_encodes_query_injection(client: FrappeClient) -> None:
+    """A ``?`` in the name must not become a real query string."""
+    url = _sent_url(client, lambda: client.get_doc("Customer", 'X?fields=["*"]'))
+    assert "?" not in url.split("/api/resource/")[1]

@@ -7,10 +7,23 @@ import logging
 import os
 import time
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
 logger = logging.getLogger("frappe_mcp")
+
+
+def _seg(value: str) -> str:
+    """Percent-encode a single URL path segment.
+
+    Tool arguments arrive from an LLM and may contain ``/``, ``?`` or ``..``.
+    Interpolating those raw would let a call escape its intended endpoint —
+    e.g. ``get_doc("Customer", "../../api/method/some.method")`` would resolve
+    to ``/api/method/some.method`` instead of a resource read. Encoding with
+    ``safe=""`` keeps every segment literal.
+    """
+    return quote(str(value), safe="")
 
 # ------------------------------------------------------------------ #
 #  Custom exception so callers can identify specific failures
@@ -204,7 +217,7 @@ class FrappeClient:
 
     def get_doc(self, doctype: str, name: str) -> dict[str, Any]:
         """Retrieve a single document by doctype and name."""
-        return self._get(f"/api/resource/{doctype}/{name}")
+        return self._get(f"/api/resource/{_seg(doctype)}/{_seg(name)}")
 
     def search_docs(
         self,
@@ -231,23 +244,23 @@ class FrappeClient:
         params["limit_page_length"] = min(limit, 200)
         if order_by:
             params["order_by"] = order_by
-        return self._get(f"/api/resource/{doctype}", params=params)
+        return self._get(f"/api/resource/{_seg(doctype)}", params=params)
 
     def create_doc(self, doctype: str, data: dict) -> dict[str, Any]:
         """Create a new document."""
-        return self._post(f"/api/resource/{doctype}", json_body=data)
+        return self._post(f"/api/resource/{_seg(doctype)}", json_body=data)
 
     def update_doc(
         self, doctype: str, name: str, data: dict
     ) -> dict[str, Any]:
         """Update an existing document by doctype and name."""
         return self._put(
-            f"/api/resource/{doctype}/{name}", json_body=data
+            f"/api/resource/{_seg(doctype)}/{_seg(name)}", json_body=data
         )
 
     def delete_doc(self, doctype: str, name: str) -> dict[str, Any]:
         """Delete a document by doctype and name."""
-        return self._delete(f"/api/resource/{doctype}/{name}")
+        return self._delete(f"/api/resource/{_seg(doctype)}/{_seg(name)}")
 
     def run_method(
         self, method: str, kwargs: dict | None = None
@@ -259,5 +272,5 @@ class FrappeClient:
             kwargs: Keyword arguments forwarded to the method.
         """
         return self._post(
-            f"/api/method/{method}", json_body=kwargs or {}
+            f"/api/method/{_seg(method)}", json_body=kwargs or {}
         )
