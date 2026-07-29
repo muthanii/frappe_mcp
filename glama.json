@@ -1,4 +1,8 @@
 {
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": [
+    "muthanii"
+  ],
   "name": "Frappe MCP Server",
   "description": "MCP server for Frappe Framework — interact with Frappe/ERPNext sites via Claude, Copilot, and other MCP clients through REST API.",
   "categories": ["ERP Systems", "Databases", "Developer Tools"],
