@@ -1,5 +1,7 @@
 # Frappe MCP Server
 
+[![frappe_mcp MCP server](https://glama.ai/mcp/servers/muthanii/frappe_mcp/badges/score.svg)](https://glama.ai/mcp/servers/muthanii/frappe_mcp)
+
 [![frappe_mcp MCP server](https://glama.ai/mcp/servers/muthanii/frappe_mcp/badges/card.svg)](https://glama.ai/mcp/servers/muthanii/frappe_mcp)
 
 A **Model Context Protocol (MCP) server** for [Frappe Framework](https://frappeframework.com).
