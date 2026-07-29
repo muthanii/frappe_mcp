@@ -8,7 +8,7 @@
     "source": "github"
   },
   "websiteUrl": "https://github.com/muthanii/frappe_mcp",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "packages": [
     {
       "registryType": "pypi",
@@ -61,7 +61,53 @@
     },
     {
       "registryType": "oci",
-      "identifier": "docker.io/muthanii/frappe-mcp:1.1.1",
+      "identifier": "docker.io/muthanii/frappe-mcp:1.1.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "FRAPPE_URL",
+          "description": "Base URL of your Frappe/ERPNext site, e.g. https://your-site.erpnext.com",
+          "isRequired": true,
+          "isSecret": false,
+          "format": "string"
+        },
+        {
+          "name": "FRAPPE_API_KEY",
+          "description": "Frappe API key for token-based authentication",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "FRAPPE_API_SECRET",
+          "description": "Frappe API secret paired with the API key",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "FRAPPE_VERIFY_SSL",
+          "description": "Set to 'false' to skip TLS certificate verification. Defaults to 'true'.",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string",
+          "default": "true"
+        },
+        {
+          "name": "FRAPPE_TIMEOUT",
+          "description": "Per-request timeout in seconds. Defaults to 30.",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "number",
+          "default": "30"
+        }
+      ]
+    },
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/muthanii/frappe-mcp:1.1.2",
       "transport": {
         "type": "stdio"
       },

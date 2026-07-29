@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 LABEL org.opencontainers.image.title="Frappe MCP Server"
 LABEL org.opencontainers.image.description="MCP server for Frappe Framework — interact with Frappe/ERPNext sites via MCP clients"
-LABEL org.opencontainers.image.source="https://hub.docker.com/r/muthanii/frappe-mcp"
+LABEL org.opencontainers.image.source="https://github.com/muthanii/frappe_mcp"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Ownership marker for the official MCP registry
